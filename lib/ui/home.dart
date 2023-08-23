@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Story App"),
+        title: const Text("Story App"),
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {

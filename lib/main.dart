@@ -23,13 +23,13 @@ class MyApp extends StatelessWidget {
         future: AuthManager.isLoggedIn(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           } else if (snapshot.hasError) {
             return Text('Terjadi kesalahan: ${snapshot.error}');
           } else if (snapshot.data == true) {
-            return HomePage();
+            return const HomePage();
           } else {
-            return LoginPage();
+            return const LoginPage();
           }
         },
       ),
