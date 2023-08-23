@@ -17,4 +17,9 @@ class AuthManager {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(authTokenKey, token);
   }
+
+  static Future<void> clearToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  }
 }

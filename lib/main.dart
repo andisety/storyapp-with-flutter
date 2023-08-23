@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:story_app/ui/home.dart';
 import 'package:story_app/ui/login_page.dart';
 import 'package:story_app/utils/Authmanager.dart';
 
@@ -26,12 +27,7 @@ class MyApp extends StatelessWidget {
           } else if (snapshot.hasError) {
             return Text('Terjadi kesalahan: ${snapshot.error}');
           } else if (snapshot.data == true) {
-            return Scaffold(
-              appBar: AppBar(title: Text('Halaman Utama')),
-              body: Center(
-                child: Text('Selamat datang di halaman utama!'),
-              ),
-            );
+            return HomePage();
           } else {
             return LoginPage();
           }

@@ -8,3 +8,5 @@ const Color KButtonColor = Color(0xff78258b);
 const Color KWhiteColor = Colors.white;
 String image1 = "assets/images/Sally.png";
 String image2 = "assets/images/register.png";
+
+

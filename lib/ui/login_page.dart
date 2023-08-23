@@ -1,10 +1,114 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:story_app/ui/home.dart';
 import 'package:story_app/ui/register_page.dart';
 import 'package:story_app/utils/utils.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+import '../repository/repository.dart';
+
+class LoginPage extends StatefulWidget {
+  LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+
+  final TextEditingController _passwordController = TextEditingController();
+
+  final repository = Repository();
+
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.black54,
+      textColor: Colors.white,
+    );
+  }
+
+  Future<void> _showResultDialog(BuildContext context, String message,
+      {bool isError = false}) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(isError ? Icons.error : Icons.check_circle,
+                size: 48, color: isError ? Colors.red : Colors.green),
+            SizedBox(height: 16),
+            Text(
+              message,
+              style: TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              if (!isError) {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => HomePage()));
+              }
+              if (isError) {
+                Navigator.pop(context);
+                _emailController.text = '';
+                _passwordController.text = '';
+              }
+            },
+            child: Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _login() async {
+    showDialog(
+      context: context,
+      builder: (context) => const AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text("login....."),
+          ],
+        ),
+      ),
+    );
+
+    if (_emailController.text.isEmpty) {
+      _showToast("Email tidak boleh kosong");
+      Navigator.pop(context);
+    } else if (_passwordController.text.isEmpty) {
+      _showToast("password tidak boleh kosong");
+      Navigator.pop(context);
+    } else {
+      try {
+        final response = await repository.login(
+            _emailController.text.trim(), _passwordController.text.trim());
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
+        if (response.error) {
+          // ignore: use_build_context_synchronously
+          _showResultDialog(context, response.message, isError: true);
+        } else {
+          // ignore: use_build_context_synchronously
+          _showResultDialog(context, "Login Success");
+        }
+      } catch (e) {
+        Navigator.pop(context); // Close loading dialog
+        _showResultDialog(context, "Login failed \n ${e.toString()}",
+            isError: true);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +148,7 @@ class LoginPage extends StatelessWidget {
                 height: size.height * 0.024,
               ),
               TextField(
+                controller: _emailController,
                 style: const TextStyle(color: kInputColor),
                 decoration: InputDecoration(
                   filled: true,
@@ -61,6 +166,7 @@ class LoginPage extends StatelessWidget {
                 height: size.height * 0.020,
               ),
               TextField(
+                controller: _passwordController,
                 obscureText: true,
                 keyboardType: TextInputType.text,
                 style: const TextStyle(color: kInputColor),
@@ -94,7 +200,9 @@ class LoginPage extends StatelessWidget {
                           color: KWhiteColor, fontWeight: FontWeight.w700),
                     ),
                   ),
-                  onPressed: () {}),
+                  onPressed: () {
+                    _login();
+                  }),
               SizedBox(
                 height: size.height * 0.040,
               ),
