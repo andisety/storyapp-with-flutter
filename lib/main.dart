@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:story_app/ui/login_page.dart';
+import 'package:story_app/utils/Authmanager.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,12 +13,30 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Story App',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      home: FutureBuilder<bool>(
+        future: AuthManager.isLoggedIn(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text('Terjadi kesalahan: ${snapshot.error}');
+          } else if (snapshot.data == true) {
+            return Scaffold(
+              appBar: AppBar(title: Text('Halaman Utama')),
+              body: Center(
+                child: Text('Selamat datang di halaman utama!'),
+              ),
+            );
+          } else {
+            return LoginPage();
+          }
+        },
+      ),
     );
   }
 }

@@ -1,9 +1,107 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:story_app/repository/repository.dart';
 import 'package:story_app/utils/utils.dart';
 
-class RegisterPage extends StatelessWidget {
-  const RegisterPage({super.key});
+class RegisterPage extends StatefulWidget {
+  RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController _nameController = TextEditingController();
+
+  final TextEditingController _emailController = TextEditingController();
+
+  final TextEditingController _passwordController = TextEditingController();
+
+  final repository = Repository();
+
+  bool isLoading = false;
+
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.black54,
+      textColor: Colors.white,
+    );
+  }
+
+  Future<void> _showResultDialog(BuildContext context, String message,
+      {bool isError = false}) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(isError ? Icons.error : Icons.check_circle,
+                size: 48, color: isError ? Colors.red : Colors.green),
+            SizedBox(height: 16),
+            Text(message),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _emailController.text = '';
+              _nameController.text = '';
+              _passwordController.text = '';
+            },
+            child: Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _register() async {
+    showDialog(
+      context: context,
+      builder: (context) => const AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text("Registering..."),
+          ],
+        ),
+      ),
+    );
+
+    if (_nameController.text.isEmpty) {
+      _showToast("nama tidak boleh kosong");
+    } else if (_emailController.text.isEmpty) {
+      _showToast("Email tidak boleh kosong");
+    } else if (_passwordController.text.isEmpty) {
+      _showToast("password tidak boleh kosong");
+    } else {
+      try {
+        final response = await repository.register(_nameController.text,
+            _emailController.text, _passwordController.text);
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
+        if (response.error) {
+          // ignore: use_build_context_synchronously
+          _showResultDialog(context, response.message, isError: true);
+        } else {
+          // ignore: use_build_context_synchronously
+          _showResultDialog(context, "Register Success");
+        }
+      } catch (e) {
+        Navigator.pop(context); // Close loading dialog
+        _showResultDialog(context, "Registration failed \n ${e.toString()}",
+            isError: true);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +133,7 @@ class RegisterPage extends StatelessWidget {
                 height: size.height * 0.024,
               ),
               TextField(
+                controller: _nameController,
                 style: const TextStyle(color: kInputColor),
                 decoration: InputDecoration(
                   filled: true,
@@ -52,6 +151,7 @@ class RegisterPage extends StatelessWidget {
                 height: size.height * 0.024,
               ),
               TextField(
+                controller: _emailController,
                 style: const TextStyle(color: kInputColor),
                 decoration: InputDecoration(
                   filled: true,
@@ -72,6 +172,7 @@ class RegisterPage extends StatelessWidget {
                 height: size.height * 0.020,
               ),
               TextField(
+                controller: _passwordController,
                 obscureText: true,
                 keyboardType: TextInputType.text,
                 style: const TextStyle(color: kInputColor),
@@ -105,7 +206,9 @@ class RegisterPage extends StatelessWidget {
                           color: KWhiteColor, fontWeight: FontWeight.w700),
                     ),
                   ),
-                  onPressed: () {}),
+                  onPressed: () {
+                    _register();
+                  }),
               SizedBox(
                 height: size.height * 0.040,
               ),
