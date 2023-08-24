@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:story_app/utils/Authmanager.dart';
 import '../model/model.dart';
 import 'package:http/http.dart' as http;
+// ignore: depend_on_referenced_packages
+import 'package:http_parser/http_parser.dart';
 
 class Repository {
   final baseUrl = "https://story-api.dicoding.dev/v1";
@@ -82,6 +84,44 @@ class Repository {
       }
     } catch (e) {
       print('An error occurred while making the HTTP request.');
+      throw e;
+    }
+  }
+
+  Future<ResponseApi> postStory(StoryModel story) async {
+    final token = await AuthManager.getAuthToken();
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'multipart/form-data',
+    };
+    try {
+      final request =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/stories'));
+      request.headers.addAll(headers);
+
+      request.fields['description'] = story.description;
+      // if (story.lat != null) request.fields['lat'] = story.lat.toString();
+      // if (story.lon != null) request.fields['lon'] = story.lon.toString();
+
+      final file = await http.MultipartFile.fromPath('photo', story.photo.path,
+          contentType:
+              MediaType('image', 'jpeg')); // Adjust content type as needed
+
+      request.files.add(file);
+
+      final response = await request.send();
+      if (response.statusCode == 201) {
+        final responseBody = await response.stream.bytesToString();
+        final responseData = json.decode(responseBody);
+        print("upload sukses sukses");
+        return ResponseApi.fromJson(responseData);
+      } else {
+        print('Post failed with status: ${response.statusCode}');
+        throw Exception(
+            'HTTP request failed with status: ${response.statusCode}, with : ${response.stream.bytesToString()}');
+      }
+    } catch (e) {
+      print('An error occurred while making the HTTP request: $e');
       throw e;
     }
   }

@@ -4,6 +4,7 @@ import 'package:story_app/ui/login_page.dart';
 import 'package:story_app/utils/Authmanager.dart';
 
 import '../repository/repository.dart';
+import 'addStory.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -33,7 +34,14 @@ class _HomePageState extends State<HomePage> {
               if (value == "logout") {
                 AuthManager.clearToken();
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => LoginPage()));
+                    MaterialPageRoute(builder: (context) => const LoginPage()));
+              }
+              if (value == "maps") {
+                AuthManager.clearToken();
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AddStoryPage()));
               }
             },
             itemBuilder: (BuildContext context) {
@@ -162,7 +170,10 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: ((context) => AddStoryPage())));
+        },
         child: const Icon(Icons.add),
       ),
     );
