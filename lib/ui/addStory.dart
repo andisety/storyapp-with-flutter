@@ -97,7 +97,7 @@ class _AddStoryPageState extends State<AddStoryPage> {
           children: [
             CircularProgressIndicator(),
             SizedBox(height: 16),
-            Text("login....."),
+            Text("Uploading....."),
           ],
         ),
       ),
@@ -120,7 +120,7 @@ class _AddStoryPageState extends State<AddStoryPage> {
         Navigator.pop(context);
         if (!response.error) {
           // Post successful
-          _showResultDialog(context, "Login Success");
+          _showResultDialog(context, "Upload Success");
           print('Post success');
         } else {
           // Post failed
@@ -149,7 +149,8 @@ class _AddStoryPageState extends State<AddStoryPage> {
 
   Future<void> _pickImageFromCamera() async {
     try {
-      final XFile? images = await picker.pickImage(source: ImageSource.camera);
+      final XFile? images =
+          await picker.pickImage(source: ImageSource.camera, imageQuality: 20);
       imagepicker = File(images!.path);
       setState(() {});
     } catch (e) {
