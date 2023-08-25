@@ -5,6 +5,7 @@ import 'package:story_app/utils/Authmanager.dart';
 
 import '../repository/repository.dart';
 import 'addStory.dart';
+import 'maps_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,15 +17,16 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late Future<List<ListStory>> listStory;
   final Repository repository = Repository();
+  // String? token = await AuthManager.getAuthToken();
+  late String? token;
 
-  @override
-  void initState() {
-    super.initState();
-    listStory = repository.getStory();
+  Future<void> getToken() async {
+    token = await AuthManager.getAuthToken();
   }
 
   @override
   Widget build(BuildContext context) {
+    getToken();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Story App"),
@@ -41,7 +43,9 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const AddStoryPage()));
+                        builder: (context) => MapPage(
+                              token: token.toString(),
+                            )));
               }
             },
             itemBuilder: (BuildContext context) {

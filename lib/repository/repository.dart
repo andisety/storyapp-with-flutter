@@ -71,6 +71,7 @@ class Repository {
       });
 
       if (response.statusCode == 200) {
+        print(token);
         final responseData = jsonDecode(response.body);
         final List<dynamic> storiesJson = responseData['listStory'];
         final List<ListStory> stories = storiesJson.map((storyJson) {
@@ -81,6 +82,32 @@ class Repository {
       } else {
         throw Exception(
             'HTTP request failed with status: ${response.statusCode}, with : ${response.body}');
+      }
+    } catch (e) {
+      print('An error occurred while making the HTTP request.');
+      throw e;
+    }
+  }
+
+  Future<List<ListStory>> getStoryMap(String token) async {
+    // String? token = await AuthManager.getAuthToken();
+    final url = '$baseUrl/stories?location=1';
+
+    try {
+      final response = await http
+          .get(Uri.parse(url), headers: {'Authorization': 'Bearer $token'});
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final List<dynamic> storiesJson = responseData['listStory'];
+        final List<ListStory> stories = storiesJson.map((storyJson) {
+          return ListStory.fromJson(storyJson);
+        }).toList();
+
+        return stories;
+      } else {
+        throw Exception(
+            'HTTP request failed with status: ${response.statusCode}, with : ${response.body} token:$token and : ${response.headers}');
       }
     } catch (e) {
       print('An error occurred while making the HTTP request.');

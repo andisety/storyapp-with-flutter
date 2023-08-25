@@ -5,6 +5,7 @@ class AuthManager {
 
   static Future<bool> isLoggedIn() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
     return prefs.containsKey(authTokenKey);
   }
 
